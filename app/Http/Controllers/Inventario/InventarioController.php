@@ -62,7 +62,6 @@ class InventarioController extends Controller
             'inventario' =>$inventario,
             'producto'  => Producto::orderBy('Referencia_producto')->get(['ID_PRODUCTO','Referencia_producto']),
             'usuarios'   => Usuario::orderBy('Nombres')->get(['ID_USUARIO','Nombres','Apellidos']), 
-
         ]);
     
     }
@@ -73,7 +72,7 @@ class InventarioController extends Controller
     public function update(UpdateInventarioRequest $request, Inventario $inventario)
     {
         $inventario->update($request->validated());
-        return redirect()->route('inventario.index')->witch('ok','Producto actualizado');
+        return redirect()->route('inventario.index')->with('ok','Producto actualizado');
 
     }
 

@@ -2,15 +2,15 @@
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h2 class="text-xl font-bold mb-6">Editar producto de inventario</h2>
+                <h2 class="text-xl font-bold mb-6">Editar inventario</h2>
 
-                <form action="{{ route('inventario.update', $inventario) }}" method="POST" class="space-y-6">
+                <form action="{{ route('pedido.update', $pedido) }}" method="POST" class="space-y-6">
                     @csrf
                     @method('PUT')
 
-                    @include('inventario._form', [
-                        'inventario' => $inventario,
-                        'producto'   => $producto,
+                    @include('pedido._form', [
+                        'pedido' => $pedido,
+                        'productos'   => $productos,
                         'usuarios'   => $usuarios,
                     ])
 
@@ -19,7 +19,7 @@
                             Actualizar
                         </button>
 
-                        <a href="{{ route('inventario.index') }}" class="px-4 py-2 border rounded">
+                        <a href="{{ route('pedido.index') }}" class="px-4 py-2 border rounded">
                             Cancelar
                         </a>
                     </div>

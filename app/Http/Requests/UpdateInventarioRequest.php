@@ -22,7 +22,7 @@ class UpdateInventarioRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('inventario') ? $this->route('inventario')->ID_INVENTARIO : null;
+        $id = $this->route('inventario') ? $this->route('inventario')->id : null;
         
 
         return [
@@ -30,7 +30,7 @@ class UpdateInventarioRequest extends FormRequest
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('producto','Referencia_producto')->ignore($id, 'ID_INVENTARIO')
+                Rule::unique('producto','Referencia_producto')->ignore($id, 'inventario_id')
             ],
             'Categoria_producto'  => 'required|string|max:50',
             'Color_producto'      => 'required|string|max:50',

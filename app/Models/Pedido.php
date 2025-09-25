@@ -31,7 +31,10 @@ class Pedido extends Model
 {
 	protected $table = 'pedido';
 	protected $primaryKey = 'ID_PEDIDO';
-	public $timestamps = false;
+	public $timestamps = true;
+
+	const CREATED_AT = 'Created_at';
+    const UPDATED_AT = 'Updated_at';
 
 	protected $casts = [
 		'Fecha_de_compra' => 'datetime',
@@ -46,16 +49,13 @@ class Pedido extends Model
 		'Fecha_de_entrega',
 		'Total_de_pago',
 		'Estado_pedido',
-		'Created_at',
-		'Updated_at'
 	];
 
 	public function productos()
-	{
-		return $this->belongsToMany(Producto::class, 'pedido_has_producto')
-					->withPivot('ID_PEDIDO_PRODUCTO');
-	}
-
+{
+    return $this->belongsToMany(Producto::class, 'pedido_has_producto', 'pedido_id', 'producto_id')
+                ->withPivot('ID_PEDIDO_PRODUCTO');
+}
 	public function usuarios()
 	{
 		return $this->belongsToMany(Usuario::class, 'usuarios_has_pedido', 'pedido_id', 'usuarios_id')
@@ -64,6 +64,6 @@ class Pedido extends Model
 
 	public function venta()
 	{
-		return $this->hasMany(Ventum::class);
+		return $this->hasMany(Ventum::class,  'pedido_id');
 	}
 }
