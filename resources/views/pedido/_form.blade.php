@@ -4,7 +4,7 @@
 
 <div class="space-y-6 max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-lg">
 
-    <!-- Fecha de  compra- fecha de entrega -->
+    <!-- Fechas -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -44,17 +44,115 @@
         </div>
     </div>
 
-    <!-- Total de pago  -->
+    <!-- Productos (ahora como array) -->
     <div>
         <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Total_de_pago <span class="text-red-500">*</span>
+            Productos del pedido <span class="text-red-500">*</span>
+        </label>
+
+        <!-- Mostrar productos existentes o al menos uno vacío -->
+        @php
+            $productosParaMostrar = old('productos', isset($pedido) ? $pedido->productos->map(function($p) {
+                return [
+                    'producto_id' => $p->ID_PRODUCTO,
+                    'cantidad' => $p->pivot->Cantidad_solicitada
+                ];
+            })->values()->all() : [['producto_id' => null, 'cantidad' => 1]]);
+        @endphp
+
+        @foreach($productosParaMostrar as $index => $item)
+            <div class="flex gap-4 mb-3 items-end">
+                <div class="flex-1">
+                    <select
+                        name="productos[{{ $index }}][producto_id]"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    >
+                        <option value="">-- Selecciona un producto --</option>
+                        @foreach ($productos as $producto)
+                            <option
+                                value="{{ $producto->ID_PRODUCTO }}"
+                                @selected(($item['producto_id'] ?? null) == $producto->ID_PRODUCTO)
+                            >
+                                [{{ $producto->ID_PRODUCTO }}] {{ $producto->Referencia_producto }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <input
+                        type="number"
+                        name="productos[{{ $index }}][cantidad]"
+                        value="{{ $item['cantidad'] ?? 1 }}"
+                        min="1"
+                        class="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    >
+                </div>
+            </div>
+        @endforeach
+
+        @error('productos')
+            <p class="mt-2 text-sm text-red-600 font-medium flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                {{ $message }}
+            </p>
+        @enderror
+    </div>
+
+    <!-- Método de pago -->
+    <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Método de pago <span class="text-red-500">*</span>
+        </label>
+        <select
+            name="Metodo_pago"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 shadow-sm bg-white"
+            required
+        >
+            <option value="" disabled {{ !$val('Metodo_pago') ? 'selected' : '' }}>
+                -- Selecciona un método de pago --
+            </option>
+            <option value="credito" @selected($val('Metodo_pago') == 'credito')>
+                Crédito
+            </option>
+            <option value="efectivo" @selected($val('Metodo_pago') == 'efectivo')>
+                Efectivo
+            </option>
+            <option value="pago_movil" @selected($val('Metodo_pago') == 'pago_movil')>
+                Pago Móvil
+            </option>
+            <option value="tarjeta" @selected($val('Metodo_pago') == 'tarjeta')>
+                Tarjeta
+            </option>
+            <option value="transferencia" @selected($val('Metodo_pago') == 'transferencia')>
+                Transferencia
+            </option>
+            <option value="voucher" @selected($val('Metodo_pago') == 'voucher')>
+                Voucher
+            </option>
+        </select>
+        @error('Metodo_pago')
+            <p class="mt-2 text-sm text-red-600 font-medium flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                {{ $message }}
+            </p>
+        @enderror
+    </div>
+
+    <!-- Total de pago -->
+    <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Total de pago <span class="text-red-500">*</span>
         </label>
         <input
-            type="text"
+            type="number"
             name="Total_de_pago"
             value="{{ $val('Total_de_pago') }}"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 shadow-sm"
             required
+            min="0"
+            step="0.01"
         >
         @error('Total_de_pago')
             <p class="mt-2 text-sm text-red-600 font-medium flex items-center">
@@ -63,7 +161,8 @@
             </p>
         @enderror
     </div>
-    <!-- Estado -->
+
+    <!-- Estado del pedido -->
     <div>
         <label class="block text-sm font-semibold text-gray-700 mb-2">
             Estado del pedido <span class="text-red-500">*</span>
@@ -73,20 +172,26 @@
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 shadow-sm bg-white"
             required
         >
-            <option value="" disabled {{ !$val('Estado_pedido') ? '' : '' }}>
+            <option value="" disabled {{ !$val('Estado_pedido') ? 'selected' : '' }}>
                 -- Selecciona un estado --
             </option>
-            <option value="CANCELADO" @selected($val('Estado_pedido') == 'CANCELADO')>
-                🟢 CANCELADO
+            <option value="Cancelado" @selected($val('Estado_pedido') == 'Cancelado')>
+                🟢 Cancelado
             </option>
-            <option value="EN PROCESO" @selected($val('Estado_pedido') == 'EN PROCESO')>
-                🟣 EN PROCESO
+            <option value="Devuelto" @selected($val('Estado_pedido') == 'Devuelto')>
+                🟣 Devuelto
             </option>
-            <option value="ENTREGADO" @selected($val('Estado_pedido') == 'ENTREGADO')>
-                🟡 ENTREGADO
+            <option value="En proceso" @selected($val('Estado_pedido') == 'En proceso')>
+                🟠 En proceso
             </option>
-            <option value="PENDIENTE" @selected($val('Estado_pedido') == 'PENDIENTE')>
-                🔴  PENDIENTE
+            <option value="Entregado" @selected($val('Estado_pedido') == 'Entregado')>
+                🟤 Entregado
+            </option>
+            <option value="Enviado" @selected($val('Estado_pedido') == 'Enviado')>
+                🟡 Enviado
+            </option>
+            <option value="Pendiente" @selected($val('Estado_pedido') == 'Pendiente')>
+                🔴 Pendiente
             </option>
         </select>
         @error('Estado_pedido')
@@ -103,27 +208,28 @@
             Asignar a usuario <span class="text-red-500">*</span>
         </label>
         <select
-            name="usuarios_id"
+            name="ID_USUARIO"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 shadow-sm bg-white"
             required
         >
-            <option value="" disabled {{ !$val('usuarios_id') ? 'selected' : '' }}>
+            <option value="" disabled {{ !$val('ID_USUARIO') ? 'selected' : '' }}>
                 -- Selecciona un usuario --
             </option>
             @foreach ($usuarios as $usuario)
                 <option
                     value="{{ $usuario->ID_USUARIO }}"
-                    @selected($val('usuarios_id') == $usuario->ID_USUARIO)
+                    @selected($val('ID_USUARIO') == $usuario->ID_USUARIO)
                 >
                     [{{ $usuario->ID_USUARIO }}] {{ $usuario->Nombres }} {{ $usuario->Apellidos }}
                 </option>
             @endforeach
         </select>
-        @error('usuarios_id')
+        @error('ID_USUARIO')
             <p class="mt-2 text-sm text-red-600 font-medium flex items-center">
                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
                 {{ $message }}
             </p>
         @enderror
     </div>
+
 </div>

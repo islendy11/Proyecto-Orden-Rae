@@ -2,14 +2,14 @@
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h2 class="text-xl font-bold mb-6">Crear Nuevo Pedido en Pedido</h2>
+                <h2 class="text-xl font-bold mb-6">Crear Nuevo Pedido </h2>
 
                 <form action="{{ route('pedido.store') }}" method="POST" class="space-y-6">
                     @csrf
                     @include('pedido._form', [
                         'pedido' => null,
-                        '$producto'   => $productos,
-                        'usuarios'   => $usuarios,
+                        'productoS'   => $productos,
+                        'usuarios'    => $usuarios,
                     ])
                     <div class="pt-4 flex gap-3">
                         <button

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $Apellidos
  * @property int $Documento
  * @property string $Correo_usuario
- * @property string $Contrase_usuario
+ * @property string $password
  * @property string $Genero
  * @property string $Telefono
  * @property string $Estado
@@ -50,12 +50,16 @@ class Usuario extends Model
 		'roles_id' => 'int'
 	];
 
+	protected $hidden = [
+		'password'
+	];
+
 	protected $fillable = [
 		'Nombres',
 		'Apellidos',
 		'Documento',
 		'Correo_usuario',
-		'Contrase_usuario',
+		'password',
 		'Genero',
 		'Telefono',
 		'Estado',

@@ -16,7 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $ID_PEDIDO
  * @property Carbon $Fecha_de_compra
  * @property Carbon $Fecha_de_entrega
- * @property int $Total_de_pago
+ * @property string $Metodo_pago
+ * @property float $Total_de_pago
  * @property string $Estado_pedido
  * @property Carbon $Created_at
  * @property Carbon $Updated_at
@@ -33,13 +34,14 @@ class Pedido extends Model
 	protected $primaryKey = 'ID_PEDIDO';
 	public $timestamps = true;
 
+
 	const CREATED_AT = 'Created_at';
-    const UPDATED_AT = 'Updated_at';
+	const UPDATED_AT = 'Updated_at';
 
 	protected $casts = [
 		'Fecha_de_compra' => 'datetime',
 		'Fecha_de_entrega' => 'datetime',
-		'Total_de_pago' => 'int',
+		'Total_de_pago' => 'float',
 		'Created_at' => 'datetime',
 		'Updated_at' => 'datetime'
 	];
@@ -47,14 +49,21 @@ class Pedido extends Model
 	protected $fillable = [
 		'Fecha_de_compra',
 		'Fecha_de_entrega',
+		'Metodo_pago',
 		'Total_de_pago',
 		'Estado_pedido',
+		'Created_at',
+		'Updated_at'
 	];
 
-	public function productos()
+public function productos()
 {
-    return $this->belongsToMany(Producto::class, 'pedido_has_producto', 'pedido_id', 'producto_id')
-                ->withPivot('ID_PEDIDO_PRODUCTO');
+    return $this->belongsToMany(
+        Producto::class,
+        'pedido_has_producto',
+        'pedido_id',
+        'producto_id'
+    )->withPivot('Cantidad_solicitada');
 }
 	public function usuarios()
 	{
@@ -64,6 +73,6 @@ class Pedido extends Model
 
 	public function venta()
 	{
-		return $this->hasMany(Ventum::class,  'pedido_id');
+		return $this->hasMany(Ventum::class);
 	}
 }
